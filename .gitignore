@@ -13,6 +13,7 @@ dist/
 *.pem
 *.mobileprovision
 *.dpapi
+.rhinesign-account.dpapi*
 *.partial
 
 engine/generated-deps/

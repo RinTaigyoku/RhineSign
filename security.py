@@ -10,7 +10,7 @@ import sys
 import threading
 import ctypes
 from i18n import tr as _t
-VERSION = '0.5.0'
+VERSION = '0.5.1'
 BASE = Path(sys.executable).resolve().parent if getattr(sys, 'frozen', False) else Path(__file__).resolve().parent
 BUNDLE = Path(getattr(sys, '_MEIPASS', BASE))
 
@@ -53,6 +53,25 @@ def key_storage(data, base=BASE):
             handle.write(encrypted)
         return {'ok': True}
     raise ValueError('Unsupported protected operation')
+
+def remembered_account(base=BASE):
+    path=base/'.rhinesign-account.dpapi'
+    if not path.exists():return None
+    if path.stat().st_size>65536:raise ValueError('Invalid protected account')
+    data=json.loads(protect_bytes(path.read_bytes(),True).decode('utf8'))
+    if not isinstance(data,dict) or set(data)!={'email','password'} or not all(isinstance(v,str) for v in data.values()):raise ValueError('Invalid protected account')
+    return data
+
+def save_account(email=None,password=None,base=BASE):
+    path=base/'.rhinesign-account.dpapi';temp=base/'.rhinesign-account.dpapi.tmp'
+    if email is None:
+        path.unlink(missing_ok=True);temp.unlink(missing_ok=True);return
+    if not isinstance(email,str) or not isinstance(password,str) or not email.strip() or not password:raise ValueError('Incomplete account')
+    encrypted=protect_bytes(json.dumps({'email':email.strip(),'password':password},ensure_ascii=False).encode('utf8'))
+    try:
+        with temp.open('wb') as handle:handle.write(encrypted);handle.flush();os.fsync(handle.fileno())
+        os.replace(temp,path)
+    finally:temp.unlink(missing_ok=True)
 
 def validate(email, password, udid, ipa, consent):
     if not email.strip() or not password:

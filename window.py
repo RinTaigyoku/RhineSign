@@ -8,7 +8,7 @@ from PySide6.QtWidgets import QApplication,QMainWindow,QWidget,QFrame,QVBoxLayou
 from qt_helpers import Var,Button,Entry,Check,Progress,Combo,messagebox
 from qt_dialogs import AuthDialogs
 from operations import Operations,read_settings,PROJECT
-from security import BUNDLE,VERSION
+from security import BUNDLE,VERSION,remembered_account
 from i18n import tr as t,set_language
 
 def label(text='',kind=None):
@@ -38,6 +38,12 @@ class RhineWindow(QMainWindow,Operations,AuthDialogs):
         self.child=None;self.dialog=None;self.aux=None;self.running=False;self.finished=False;self.workspace=None
         self.events=queue.Queue();self.devices=[];self.last_output=None;self.auto_request=None;self.pending_install=None;self.stage='';self.page='sign';self.logs=[]
         self.email,self.password,self.udid,self.ipa,self.install_ipa=(Var()for _ in range(5))
+        self.remember=Var(False);self.account_load_failed=False
+        if not preview:
+            try:
+                saved=remembered_account()
+                if saved:self.email.set(saved['email']);self.password.set(saved['password']);self.remember.set(True)
+            except (OSError,ValueError,UnicodeError):self.account_load_failed=True
         self.consent=Var(False);self.auto_install=Var(False);self.device_choice=Var();self.status=Var();self.install_status=Var();self.device_status=Var()
         set_language(read_settings()['language']);self.setWindowTitle('RhineSign');self.setWindowFlags(Qt.Window|Qt.FramelessWindowHint|Qt.WindowMinMaxButtonsHint);self.setAttribute(Qt.WA_TranslucentBackground)
         self.app_icon=QIcon()
@@ -49,6 +55,7 @@ class RhineWindow(QMainWindow,Operations,AuthDialogs):
         available=QApplication.primaryScreen().availableGeometry();self.resize(min(1120,available.width()-50),min(860,available.height()-50));self.move(available.center()-self.rect().center())
         self.logs=[t('等待选择 IPA。')];self.build();self.after(100,self.poll)
         if not preview:self.after(500,self.refresh_devices)
+        if self.account_load_failed:self.after(600,lambda:messagebox.showerror('RhineSign',t('本机保存的账号无法解密，请重新输入。'),parent=self))
     def title(self,value):self.setWindowTitle(value)
     def after(self,delay,fn):QTimer.singleShot(delay,self,lambda:None if self._closed else fn())
     def toggle_maximize(self):self.showNormal()if self.isMaximized()else self.showMaximized()
@@ -78,9 +85,12 @@ class RhineWindow(QMainWindow,Operations,AuthDialogs):
         group.addWidget(entry);grid.addLayout(group,r,c);self.entries.append(entry);return entry
     def build_sign(self):
         layout=self.page_layouts['sign'];account,box=card('账号','01 / APPLE ID');grid=QGridLayout();grid.setHorizontalSpacing(17);grid.setColumnStretch(0,1);grid.setColumnStretch(1,1)
-        self.field(grid,0,0,'Apple ID',self.email);self.field(grid,0,1,'登录密码',self.password,True);box.addLayout(grid);layout.addWidget(account)
+        email=self.field(grid,0,0,'Apple ID',self.email);password=self.field(grid,0,1,'登录密码',self.password,True);box.addLayout(grid)
+        self.remember_check=Check(t('记住 Apple ID 和密码（仅当前 Windows 用户）'));self.remember.bind(self.remember_check);self.remember_check.toggled.connect(self.remember_changed)
+        email.editingFinished.connect(self.persist_account);password.editingFinished.connect(self.persist_account)
+        box.addWidget(self.remember_check);layout.addWidget(account)
         app,box=card('应用与目标设备','02 / IPA + USB');entry=Entry();entry.setPlaceholderText(t('选择要签名的 IPA'));self.ipa.bind(entry);self.entries.append(entry);self.browse=Button(t('选择 IPA…'),self.pick_ipa);box.addLayout(row(entry,self.browse))
-        entry=Entry();entry.setPlaceholderText('iPhone UDID');self.udid.bind(entry);self.entries.append(entry);self.paste=Button(t('读取设备'),self.use_device);box.addLayout(row(entry,self.paste));box.addWidget(label(t('密码和验证码仅用于本次认证。签名文件单独输出，原 IPA 保留。'),'muted'));layout.addWidget(app)
+        entry=Entry();entry.setPlaceholderText('iPhone UDID');self.udid.bind(entry);self.entries.append(entry);self.paste=Button(t('读取设备'),self.use_device);box.addLayout(row(entry,self.paste));box.addWidget(label(t('勾选记住后账号密码由 Windows 加密保存在本机；验证码与登录会话不保存。'),'muted'));layout.addWidget(app)
         self.check=Check(t('已阅读设置页的服务说明，同意本次个人签名'));self.consent.bind(self.check);layout.addWidget(self.check);self.auto=Check(t('签名完成后安装到已连接的目标 iPhone'));self.auto_install.bind(self.auto);layout.addWidget(self.auto)
         self.start_button=Button(t('开始个人签名  →'),self.start,True);self.cancel_button=Button(t('取消任务'),self.cancel);self.cancel_button.setEnabled(False);output=Button(t('输出文件夹'),self.open_output);output.setObjectName('quiet');layout.addLayout(row(self.start_button,self.cancel_button,None,output))
         self.status.set(t('准备就绪'));status=label('','muted');self.status.bind(status);self.log=QPlainTextEdit();self.log.setReadOnly(True);self.log.setMaximumBlockCount(180);self.log.setFixedHeight(78)
@@ -101,7 +111,7 @@ class RhineWindow(QMainWindow,Operations,AuthDialogs):
         layout.addWidget(label(t('安装失败时保留当前 App，不自动卸载。需要 Apple 的 USB 驱动和设备服务。'),'muted'));layout.addStretch()
     def build_settings(self):
         layout=self.page_layouts['settings'];about,box=card('署名','RHINESIGN / '+VERSION);box.addWidget(label('RinTaigyoku','brand'));box.addLayout(row(Button(t('GitHub 项目 ↗'),lambda:webbrowser.open(PROJECT)),Button(t('下载与更新 ↗'),lambda:webbrowser.open(PROJECT+'/releases')),Button(t('许可证'),self.open_license),None));layout.addWidget(about)
-        for title,code,text in [('服务说明','AUTH / PRIVACY','认证请求发送给 Apple，认证辅助数据来自 ani.iloader.app。不会记录密码、验证码或登录会话。内部签名密钥由 Windows 当前用户加密保存。'),('使用限制','ACCOUNT / DEVICE','个人账户的有效期、设备与 App 数量由 Apple 限制。签名暂不支持带 App Extension 的 IPA；设备安装不提供绕过签名或开发者模式的功能。')]:
+        for title,code,text in [('服务说明','AUTH / PRIVACY','认证请求发送给 Apple，认证辅助数据来自 ani.iloader.app。记住账号默认关闭；开启后账号密码由 Windows 当前用户加密保存，取消勾选会删除。验证码与登录会话不保存。签名密钥同样在本机加密保存。'),('使用限制','ACCOUNT / DEVICE','个人账户的有效期、设备与 App 数量由 Apple 限制。签名暂不支持带 App Extension 的 IPA；设备安装不提供绕过签名或开发者模式的功能。')]:
             frame,box=card(title,code);box.addWidget(label(t(text),'muted'));layout.addWidget(frame)
         layout.addStretch()
     def show(self,page=None):
@@ -113,6 +123,7 @@ class RhineWindow(QMainWindow,Operations,AuthDialogs):
         if hasattr(self,'install_log'):self.install_log.appendPlainText(text)
     def closeEvent(self,event):
         if self.running and not messagebox.askyesno('RhineSign',t('任务正在进行，确定取消并退出？'),parent=self,default='no'):event.ignore();return
+        if not self.persist_account():event.ignore();return
         self.cancel()
         if self.aux and self.aux.poll()is None:self.aux.terminate()
         self.password.set('');self._closed=True;event.accept()

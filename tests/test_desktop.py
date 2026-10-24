@@ -7,6 +7,20 @@ ROOT=Path(__file__).resolve().parents[1]
 class DesktopTests(unittest.TestCase):
     def tearDown(self):i18n.set_language('zh')
 
+    @unittest.skipUnless(os.name=='nt','Windows DPAPI')
+    def test_remember_account_is_encrypted_and_removable(self):
+        with tempfile.TemporaryDirectory()as folder:
+            base=Path(folder);email='remember@example.invalid';password='synthetic-password-123'
+            self.assertIsNone(security.remembered_account(base))
+            security.save_account(email,password,base)
+            raw=(base/'.rhinesign-account.dpapi').read_bytes()
+            self.assertNotIn(email.encode(),raw);self.assertNotIn(password.encode(),raw)
+            self.assertEqual(security.remembered_account(base),{'email':email,'password':password})
+            security.save_account(email,'updated-synthetic',base)
+            self.assertEqual(security.remembered_account(base)['password'],'updated-synthetic')
+            security.save_account(base=base)
+            self.assertIsNone(security.remembered_account(base));self.assertEqual(list(base.iterdir()),[])
+
     def test_arbitrary_ipa(self):
         with tempfile.TemporaryDirectory()as folder:
             p=Path(folder)/'any-release.ipa';p.write_bytes(b'synthetic')
@@ -66,6 +80,7 @@ class DesktopTests(unittest.TestCase):
     def test_build_widgets_in_both_languages(self):
         import window
         app=window.create_application();root=window.RhineWindow(preview=True)
+        self.assertFalse(root.remember.get());self.assertEqual(root.password.get(),'')
         try:
             for lang in ('zh','en'):
                 i18n.set_language(lang);root.build();app.processEvents()

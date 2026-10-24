@@ -12,7 +12,7 @@
 
 从 [Releases](https://github.com/RinTaigyoku/RhineSign/releases) 下载 Windows x64 压缩包，完整解压后打开 `RhineSign.exe`。不要单独移动 EXE，旁边的 `_internal` 也要保留。
 
-目前是 **0.5.0 Beta**。个人签名沿用已实际使用过的认证流程；USB 安装是这一版新加入的功能，设备兼容性还需要更多实测。构建和离线检查通过，不代表所有 iOS 版本都能安装成功。
+目前是 **0.5.1 Beta**。个人签名沿用已实际使用过的认证流程；USB 安装的设备兼容性还需要更多实测。构建和离线检查通过，不代表所有 iOS 版本都能安装成功。
 
 ## 怎么用
 
@@ -33,7 +33,7 @@
 
 **识别不到手机怎么办？** 先检查数据线、解锁和信任状态，再检查 Apple Mobile Device Service。只支持 USB，不会自动连接网络设备。
 
-**会保存密码吗？** 不会保存密码、验证码和登录会话。认证请求发送给 Apple，认证辅助数据来自第三方 `ani.iloader.app`。签名私钥由 Windows 当前用户加密，存放在程序旁 `.签名密钥`，用于下次复用证书；不要分享这个目录。配对记录由 Apple 本地设备服务管理。没有遥测、后台自动更新或自动撤销证书。
+**会保存密码吗？** 默认不保存。勾选“记住 Apple ID 和密码”后，用 Windows 当前用户加密保存在程序旁 `.rhinesign-account.dpapi`，下次打开自动填入。取消勾选就删除，验证码和登录会话始终不保存。认证请求发送给 Apple，认证辅助数据来自第三方 `ani.iloader.app`。签名私钥同样由 Windows 当前用户加密，存放在 `.签名密钥`，用于复用证书；不要分享账号缓存和密钥目录。配对记录由 Apple 本地设备服务管理。没有遥测、后台自动更新或自动撤销证书。
 
 **大 IPA 会不会很占内存？** USB 传输使用固定 1 MiB 缓冲，不整包读入内存。签名需要解包和重新压缩，磁盘建议预留原 IPA 大小三倍的空间。取消可能留下临时构建目录，确认没有任务运行后可以删除 `临时构建`；不要删除密钥目录。
 
@@ -63,6 +63,6 @@ Download the Windows x64 archive from [Releases](https://github.com/RinTaigyoku/
 
 This is a **beta**. USB installation is new and has not been verified across devices. Apple account limits, expiry, signature verification and Developer Mode still apply. Signing IPAs containing App Extensions is not supported yet.
 
-Passwords, verification codes and login sessions are not saved. Authentication goes to Apple; helper data comes from `ani.iloader.app`. Private signing keys are encrypted for the current Windows user and kept locally. Do not share the private-key folder or pairing records. No telemetry or automatic certificate revocation.
+Remembering the Apple ID and password is off by default. If enabled, Windows encrypts them for the current user in `.rhinesign-account.dpapi`; unchecking removes them. Verification codes and login sessions are never saved. Authentication goes to Apple; helper data comes from `ani.iloader.app`. Private signing keys are also encrypted for the current Windows user. Do not share account caches, the private-key folder or pairing records. No telemetry or automatic certificate revocation.
 
 Build instructions are above. Source is MIT; dependencies retain their licenses. Corresponding source for the patched LGPL signing library is included in each release. This is an unofficial community project.

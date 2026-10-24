@@ -1,6 +1,6 @@
 import json,os,queue,re,shutil,subprocess,threading,webbrowser
 from pathlib import Path
-from security import BASE,BUNDLE,VERSION,key_storage,validate
+from security import BASE,BUNDLE,VERSION,key_storage,validate,save_account
 from i18n import tr as t,set_language,language
 from qt_helpers import messagebox,filedialog
 PROJECT='https://github.com/RinTaigyoku/RhineSign'
@@ -38,6 +38,19 @@ def cleanup_workspace(path, pid, base=BASE):
         shutil.rmtree(path)
 
 class Operations:
+
+    def persist_account(self):
+        if self.preview:return True
+        try:
+            if not self.remember.get():save_account()
+            elif self.email.get().strip() and self.password.get():save_account(self.email.get(),self.password.get())
+            return True
+        except (OSError,ValueError,UnicodeError):
+            messagebox.showerror('RhineSign',t('账号记忆设置保存失败，请检查程序目录权限。'),parent=self.root)
+            return False
+
+    def remember_changed(self,checked):
+        self.persist_account()
 
     def switch_language(self):
         if self.running or self.aux:
@@ -132,6 +145,7 @@ class Operations:
         if issue:
             messagebox.showerror('RhineSign', issue, parent=self.root)
             return
+        if not self.persist_account():return
         if shutil.disk_usage(BASE).free < Path(self.ipa.get()).stat().st_size * 3:
             messagebox.showerror('RhineSign', t('空间不足，请预留 IPA 大小三倍的可用空间。'), parent=self.root)
             return
@@ -203,7 +217,7 @@ class Operations:
             self.events.put({'type': 'exit', 'data': process.wait(), 'channel': channel})
 
     def set_busy(self, busy):
-        for widget in self.entries + [self.browse, self.paste, self.check, self.auto, self.start_button, self.install_button, self.install_pick, self.install_entry, self.refresh, self.connect_button, self.langbutton]:
+        for widget in self.entries + [self.remember_check,self.browse, self.paste, self.check, self.auto, self.start_button, self.install_button, self.install_pick, self.install_entry, self.refresh, self.connect_button, self.langbutton]:
             widget.configure(state='disabled' if busy else 'normal')
         self.selector.configure(state='disabled' if busy else 'readonly')
         self.cancel_button.configure(state='normal' if busy else 'disabled')

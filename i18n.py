@@ -8,6 +8,11 @@ def set_language(value):
     _language=value
 
 EN={
+'认证请求发送给 Apple，认证辅助数据来自 ani.iloader.app。记住账号默认关闭；开启后账号密码由 Windows 当前用户加密保存，取消勾选会删除。验证码与登录会话不保存。签名密钥同样在本机加密保存。':'Authentication goes to Apple; helper data comes from ani.iloader.app. Remembering the account is off by default. If enabled, Windows encrypts the account and password for the current user; unchecking deletes them. Codes and sessions are not saved. Signing keys are also encrypted locally.',
+'记住 Apple ID 和密码（仅当前 Windows 用户）':'Remember Apple ID and password (this Windows user only)',
+'本机保存的账号无法解密，请重新输入。':'The saved account could not be decrypted. Enter it again.',
+'账号记忆设置保存失败，请检查程序目录权限。':'Could not save account preferences. Check the application folder permissions.',
+'勾选记住后账号密码由 Windows 加密保存在本机；验证码与登录会话不保存。':'If enabled, Windows encrypts your account and password locally. Codes and login sessions are not saved.',
 '校验重打包后的 CRC、资源和应用属性':'Verifying repacked CRC, resources and application properties',
 '保存已签名 IPA':'Saving signed IPA',
 '离线解包检查：不登录 Apple，不修改签名':'Offline extraction check: no Apple login or signature changes',
