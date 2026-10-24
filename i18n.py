@@ -8,6 +8,15 @@ def set_language(value):
     _language=value
 
 EN={
+'校验重打包后的 CRC、资源和应用属性':'Verifying repacked CRC, resources and application properties',
+'保存已签名 IPA':'Saving signed IPA',
+'离线解包检查：不登录 Apple，不修改签名':'Offline extraction check: no Apple login or signature changes',
+'离线重新打包检查':'Offline repacking check',
+'离线 CRC 与资源校验':'Offline CRC and resource verification',
+'本地 IPA 重新打包失败':'Local IPA repacking failed',
+'本地 IPA CRC、资源或属性校验失败':'Local IPA CRC, resource or property verification failed',
+'已签名 IPA 保存失败':'Saving the signed IPA failed',
+'{label}。诊断：{diagnostic}。原始 IPA 保留。':'{label}. Diagnostic: {diagnostic}. The original IPA is preserved.',
 '收起详情':'Hide details','展开详情':'Show details',
 '运行详情':'Activity details',
 '账号':'Account','应用与目标设备':'Application and target device','确定':'OK','继续':'Continue','取消':'Cancel',
@@ -105,6 +114,8 @@ _code_templates=[(re.compile('^'+re.escape(k).replace(re.escape('{code}'),r'(-?\
 def tr(value):
     if _language=='zh':return value
     if value in EN:return EN[value]
+    local=re.fullmatch(r'(.+)。诊断：(.+)。原始 IPA 保留。',value)
+    if local:return EN['{label}。诊断：{diagnostic}。原始 IPA 保留。'].format(label=EN.get(local[1],local[1]),diagnostic=local[2])
     for pattern,target in _code_templates:
         match=pattern.match(value)
         if match:return target.format(code=match.group(1))

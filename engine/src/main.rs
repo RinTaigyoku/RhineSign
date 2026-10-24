@@ -117,13 +117,38 @@ async fn run(c:&mut Config)->Result<(),Report>{
     let output=output_dir.join(format!("{}-RhineSign-{}.ipa",c.ipa.file_stem().unwrap_or_default().to_string_lossy(),stamp));
     let partial=std::env::temp_dir().join("signed.ipa.partial");
     stage("重新打包并校验全部 CRC、资源和应用属性（大型 IPA 需要几分钟）");
-    let packed=(||->Result<(),Report>{pack_signed(root,&partial)?;verify_resources(&c.ipa,&partial)?;if output.exists(){bail!("output_exists");}fs::rename(&partial,&output)?;Ok(())})();
+    let packed=(||->Result<(),Report>{
+        pack_signed(root,&partial).context("archive_pack_failed")?;
+        stage("校验重打包后的 CRC、资源和应用属性");
+        verify_resources(&c.ipa,&partial).context("archive_verify_failed")?;
+        stage("保存已签名 IPA");
+        if output.exists(){bail!("output_exists");}
+        fs::rename(&partial,&output).context("archive_save_failed")?;Ok(())})();
     if packed.is_err(){let _=fs::remove_file(&partial);}packed?;
     event("done",json!({"path":output,"bundle":bundle}));Ok(())
 }
 fn main(){
     std::panic::set_hook(Box::new(|_|event("error",json!({"message":"签名引擎异常退出；未打印内部认证响应。"}))));
     if std::env::args().nth(1).as_deref()==Some("--self-test"){if self_test().is_err(){std::process::exit(1);}return;}
+    // Credential-free reproduction of the same extraction/packing/verification path.
+    if std::env::args().nth(1).as_deref()==Some("--check-repack"){
+        let result=(||->Result<(),Report>{
+            let input=PathBuf::from(std::env::args_os().nth(2).ok_or_else(||report!("ipa_required"))?).canonicalize()?;
+            let workspace=PathBuf::from(std::env::args_os().nth(3).ok_or_else(||report!("invalid_work_dir"))?);
+            if !workspace.is_absolute()||workspace.exists(){bail!("invalid_work_dir");}
+            original_bundle(&input)?;fs::create_dir_all(&workspace)?;
+            unsafe{std::env::set_var("TEMP",&workspace);std::env::set_var("TMP",&workspace);std::env::set_var("TMPDIR",&workspace);}
+            isideload::init()?;
+            stage("离线解包检查：不登录 Apple，不修改签名");
+            let app=Application::new(input.clone())?;
+            let root=app.bundle.bundle_dir.parent().and_then(|p|p.parent()).ok_or_else(||report!("archive_root_missing"))?;
+            let packed=workspace.join("repacked.ipa");
+            stage("离线重新打包检查");pack_signed(root,&packed).context("archive_pack_failed")?;
+            stage("离线 CRC 与资源校验");verify_resources(&input,&packed).context("archive_verify_failed")?;
+            event("done",json!({"offline_repack_verified":true}));Ok(())
+        })();
+        if let Err(e)=result{event("error",json!({"message":safe_error(&e)}));std::process::exit(1);}return;
+    }
     if let Some(command)=std::env::args().nth(1){
         if ["--devices","--connect-device","--install"].contains(&command.as_str()){
             if let Err(error)=devices::dispatch(&command){event("error",json!({"message":safe_error(&error)}));std::process::exit(1);}return;

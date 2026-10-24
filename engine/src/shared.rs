@@ -88,6 +88,29 @@ pub(crate) fn verify_resources(input: &Path, output: &Path) -> Result<(),Report>
 }
 
 pub(crate) fn safe_error(report: &Report) -> String {
+    // Typed local failures are safe to classify without exposing paths or responses.
+    let mut local_code=None;
+    for node in report.iter_reports(){
+        if let Some(e)=node.downcast_current_context::<io::Error>(){
+            local_code=Some(format!("IO/{:?}/{}",e.kind(),e.raw_os_error().map(|x|x.to_string()).unwrap_or_else(||"none".into())));
+        }
+        if let Some(e)=node.downcast_current_context::<zip::result::ZipError>(){
+            local_code=Some(match e {
+                zip::result::ZipError::Io(e)=>format!("ZIP/IO/{:?}/{}",e.kind(),e.raw_os_error().map(|x|x.to_string()).unwrap_or_else(||"none".into())),
+                _=>format!("ZIP/{e}"),
+            });
+        }
+    }
+    for node in report.iter_reports(){
+        let context=node.downcast_current_context::<&str>().copied();
+        let label=match context {
+            Some("archive_pack_failed")=>Some("本地 IPA 重新打包失败"),
+            Some("archive_verify_failed")=>Some("本地 IPA CRC、资源或属性校验失败"),
+            Some("archive_save_failed")=>Some("已签名 IPA 保存失败"),
+            _=>None,
+        };
+        if let Some(label)=label{let diagnostic=local_code.as_deref().unwrap_or("LOCAL/validation");return format!("{label}。诊断：{diagnostic}。原始 IPA 保留。");}
+    }
     for node in report.iter_reports() {
         if let Some(err)=node.downcast_current_context::<SideloadError>() {
             match err {

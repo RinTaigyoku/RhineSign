@@ -1,6 +1,11 @@
 mod tests {
     use super::*;
     use isideload::SideloadError;
+    #[test] fn local_archive_error_is_not_an_authentication_error(){
+        let e:Report=report!(io::Error::from_raw_os_error(5)).context("archive_pack_failed").into();
+        let message=safe_error(&e);
+        assert!(message.contains("重新打包"));assert!(message.contains("/5"));assert!(!message.contains("认证"));
+    }
     fn synthetic_macho(executable:bool)->Vec<u8>{
         fn put(d:&mut[u8],p:usize,v:u32){d[p..p+4].copy_from_slice(&v.to_le_bytes());}
         fn long(d:&mut[u8],p:usize,v:u64){d[p..p+8].copy_from_slice(&v.to_le_bytes());}
