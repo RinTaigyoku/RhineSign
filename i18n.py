@@ -8,6 +8,7 @@ def set_language(value):
     _language=value
 
 EN={
+'最小化到任务栏':'Minimize to taskbar','最大化或恢复':'Maximize or restore',
 '显示密码':'Show password','隐藏密码':'Hide password',
 '显示验证码':'Show verification code','隐藏验证码':'Hide verification code',
 '离线测试签名后重打包：仅处理副本，不登录 Apple':'Offline signature/repack test: copies only, no Apple login',

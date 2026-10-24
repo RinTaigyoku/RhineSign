@@ -59,14 +59,16 @@ class RhineWindow(QMainWindow,Operations,AuthDialogs):
     def title(self,value):self.setWindowTitle(value)
     def after(self,delay,fn):QTimer.singleShot(delay,self,lambda:None if self._closed else fn())
     def toggle_maximize(self):self.showNormal()if self.isMaximized()else self.showMaximized()
+    def minimize_to_taskbar(self):self.showMinimized()
     def build(self):
         self.entries=[];central=QWidget();outer=QVBoxLayout(central);outer.setContentsMargins(7,7,7,7);outer.setSpacing(0)
         shell=QFrame();shell.setObjectName('shell');outer.addWidget(shell);box=QVBoxLayout(shell);box.setContentsMargins(1,1,1,1);box.setSpacing(0)
         title=TitleBar();title.setObjectName('titlebar');title.setFixedHeight(48);bar=QHBoxLayout(title);bar.setContentsMargins(17,5,10,5)
         mark=QLabel();mark.setPixmap(self.app_icon.pixmap(24,24));bar.addWidget(mark);bar.addWidget(label('RhineSign'));bar.addStretch()
         self.langbutton=Button('中文 / EN',self.switch_language);self.langbutton.setObjectName('quiet');bar.addWidget(self.langbutton)
-        for text,action,name in [('−',self.showMinimized,'windowControl'),('□',self.toggle_maximize,'windowControl'),('×',self.close,'windowClose')]:
-            b=Button(text,action);b.setFixedSize(34,30);b.setObjectName(name);bar.addWidget(b)
+        for text,action,name,hint in [('−',self.minimize_to_taskbar,'windowControl','最小化到任务栏'),('□',self.toggle_maximize,'windowControl','最大化或恢复'),('×',self.close,'windowClose','关闭')]:
+            b=Button(text,action);b.setFixedSize(34,30);b.setObjectName(name);b.setToolTip(t(hint));b.setAccessibleName(t(hint));bar.addWidget(b)
+            if text=='−':self.minimize_button=b
         box.addWidget(title);body=QHBoxLayout();body.setSpacing(0);box.addLayout(body,1)
         side=QFrame();side.setObjectName('sidebar');side.setFixedWidth(210);nav=QVBoxLayout(side);nav.setContentsMargins(18,27,18,18);nav.setSpacing(7)
         badge=QLabel();badge.setPixmap(self.app_icon.pixmap(55,55));nav.addWidget(badge);nav.addSpacing(9);nav.addWidget(label('RhineSign','brand'));nav.addWidget(label('APPLICATION STUDIO','eyebrow'));nav.addSpacing(24);nav.addWidget(label('WORKSPACE / 01','eyebrow'));nav.addSpacing(5);self.nav=[]

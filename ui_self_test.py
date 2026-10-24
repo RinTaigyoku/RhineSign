@@ -14,6 +14,9 @@ def run(folder):
     try:
         assert window.windowTitle()=='RhineSign'
         assert window.windowFlags()&Qt.FramelessWindowHint;checks.append('integrated_titlebar')
+        assert not(window.windowFlags()&Qt.Tool)==Qt.Tool
+        window.minimize_button.click();application.processEvents();assert window.isMinimized()
+        window.showNormal();application.processEvents();assert not window.isMinimized();checks.append('taskbar_minimize_restore')
         assert QSvgRenderer(str(BUNDLE/'assets/check.svg')).isValid();checks.append('vector_checkbox_tick')
         for lang in('zh','en'):
             set_language(lang);window.build();application.processEvents()
