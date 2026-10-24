@@ -105,7 +105,8 @@ class RhineWindow(QMainWindow,Operations,AuthDialogs):
     def build_install(self):
         layout=self.page_layouts['install'];device,box=card('USB 连接','01 / DEVICE');box.addWidget(label(t('用数据线连接 iPhone，解锁后信任此电脑。'),'muted'))
         self.selector=Combo();self.selector.addItems(self.device_labels());self.device_choice.bind(self.selector);self.refresh=Button(t('刷新设备'),self.refresh_devices);box.addLayout(row(self.selector,self.refresh));self.connect_button=Button(t('连接并读取设备信息'),self.connect_device);box.addLayout(row(self.connect_button,None))
-        self.device_status.set(t('尚未连接设备'));status=label('','muted');self.device_status.bind(status);box.addWidget(status);layout.addWidget(device)
+        self.device_status.set(t('尚未连接设备'));status=label('','muted');self.device_status.bind(status);box.addWidget(status)
+        self.driver_download=Button(t('安装 Apple 设备软件 ↗'),self.open_device_download);self.driver_download.setObjectName('quiet');box.addLayout(row(self.driver_download,Button(t('官方安装帮助 ↗'),self.open_driver_help),None));layout.addWidget(device)
         package,box=card('安装已签名 IPA','02 / INSTALL');box.addWidget(label(t('安装不需要重新登录 Apple ID；签名必须有效且适用于这台设备。'),'muted'));self.install_entry=Entry();self.install_ipa.bind(self.install_entry);self.install_pick=Button(t('选择 IPA…'),self.pick_install);box.addLayout(row(self.install_entry,self.install_pick))
         self.install_button=Button(t('安装到 iPhone  →'),self.start_install,True);self.install_cancel=Button(t('取消任务'),self.cancel);self.install_cancel.setEnabled(False);box.addLayout(row(self.install_button,self.install_cancel,None));self.install_status.set(t('等待安装'));status=label('','muted');self.install_status.bind(status);box.addWidget(status);self.install_progress=Progress();box.addWidget(self.install_progress);layout.addWidget(package)
         self.install_log=QPlainTextEdit();self.install_log.setReadOnly(True);self.install_log.setMaximumBlockCount(180);self.install_log.setFixedHeight(78);layout.addWidget(self.install_log)
@@ -115,6 +116,7 @@ class RhineWindow(QMainWindow,Operations,AuthDialogs):
         layout=self.page_layouts['settings'];about,box=card('署名','RHINESIGN / '+VERSION);box.addWidget(label('RinTaigyoku','brand'));box.addLayout(row(Button(t('GitHub 项目 ↗'),lambda:webbrowser.open(PROJECT)),Button(t('下载与更新 ↗'),lambda:webbrowser.open(PROJECT+'/releases')),Button(t('许可证'),self.open_license),None));layout.addWidget(about)
         for title,code,text in [('服务说明','AUTH / PRIVACY','认证请求发送给 Apple，认证辅助数据来自 ani.iloader.app。记住账号默认关闭；开启后账号密码由 Windows 当前用户加密保存，取消勾选会删除。验证码与登录会话不保存。签名密钥同样在本机加密保存。'),('使用限制','ACCOUNT / DEVICE','个人账户的有效期、设备与 App 数量由 Apple 限制。签名暂不支持带 App Extension 的 IPA；设备安装不提供绕过签名或开发者模式的功能。')]:
             frame,box=card(title,code);box.addWidget(label(t(text),'muted'));layout.addWidget(frame)
+        help_card,box=card('连接帮助','HELP / USB');box.addWidget(label(t('首次连接：安装 Apple 设备软件，解锁 iPhone 并信任电脑，再回到设备安装页刷新。'),'muted'));box.addLayout(row(Button(t('安装 Apple 设备软件 ↗'),self.open_device_download),Button(t('官方安装帮助 ↗'),self.open_driver_help),None));layout.addWidget(help_card)
         layout.addStretch()
     def show(self,page=None):
         if page is None:return super().show()

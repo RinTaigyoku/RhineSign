@@ -4,6 +4,7 @@ from security import BASE,BUNDLE,VERSION,key_storage,validate,save_account
 from i18n import tr as t,set_language,language
 from qt_helpers import messagebox,filedialog
 PROJECT='https://github.com/RinTaigyoku/RhineSign'
+APPLE_DEVICES='https://apps.microsoft.com/detail/9np83lwlpz9k'
 SETTINGS=BASE/'.rhinesign-settings.json'
 def read_settings():
     try:
@@ -38,6 +39,10 @@ def cleanup_workspace(path, pid, base=BASE):
         shutil.rmtree(path)
 
 class Operations:
+
+    def open_device_download(self):webbrowser.open(APPLE_DEVICES)
+
+    def open_driver_help(self):webbrowser.open('https://support.apple.com/'+('zh-cn'if language()=='zh'else'en-us')+'/118290')
 
     def persist_account(self):
         if self.preview:return True

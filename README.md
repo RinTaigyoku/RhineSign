@@ -58,7 +58,7 @@
 
 ## 怎么用
 
-1. 安装 Apple 官方的 Windows 设备驱动与设备服务。电脑已经能通过 Apple Devices 或 iTunes 识别手机的话，通常可以直接用。
+1. 安装 Apple 官方的 Windows 设备软件。程序“设备安装”和“设置与关于”均有下载与帮助按钮，也可以查看 [Apple 官方安装说明](https://support.apple.com/zh-cn/118290)，或打开 [Microsoft Store 的 Apple 设备页面](https://apps.microsoft.com/detail/9np83lwlpz9k)。电脑已经能通过 Apple Devices 或 iTunes 识别手机的话，通常可以直接用。
 2. 数据线连接 iPhone，解锁，在手机上信任电脑。打开“设备安装”，刷新并连接设备，UDID 会带到签名页。
 3. 在“个人签名”填写 Apple ID、登录密码，选择任意 IPA。阅读设置里的服务说明，勾选同意后开始。需要双重认证时，在弹窗输入验证码。
 4. 签名完成后，到程序旁的 `签名输出` 找到新 IPA。原文件不会覆盖。可以勾选签名完成后安装，也可以在“设备安装”单独选择已有签名的 IPA。

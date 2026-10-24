@@ -8,6 +8,8 @@ def set_language(value):
     _language=value
 
 EN={
+'安装 Apple 设备软件 ↗':'Get Apple Devices ↗','官方安装帮助 ↗':'Official setup help ↗','连接帮助':'Connection help',
+'首次连接：安装 Apple 设备软件，解锁 iPhone 并信任电脑，再回到设备安装页刷新。':'First connection: install Apple Devices, unlock and trust your iPhone, then refresh the Devices page.',
 '最小化到任务栏':'Minimize to taskbar','最大化或恢复':'Maximize or restore',
 '显示密码':'Show password','隐藏密码':'Hide password',
 '显示验证码':'Show verification code','隐藏验证码':'Hide verification code',

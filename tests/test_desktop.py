@@ -7,6 +7,17 @@ ROOT=Path(__file__).resolve().parents[1]
 class DesktopTests(unittest.TestCase):
     def tearDown(self):i18n.set_language('zh')
 
+    def test_driver_help_uses_official_pages(self):
+        from operations import Operations
+        from unittest.mock import patch
+        from urllib.parse import urlparse
+        target=Operations()
+        with patch('operations.webbrowser.open')as opened:
+            target.open_device_download();self.assertEqual(urlparse(opened.call_args.args[0]).hostname,'apps.microsoft.com')
+            for lang in ('zh','en'):
+                i18n.set_language(lang);target.open_driver_help()
+                self.assertEqual(urlparse(opened.call_args.args[0]).hostname,'support.apple.com')
+
     def test_password_and_verification_code_visibility(self):
         from qt_helpers import Entry,add_visibility_toggle
         from PySide6.QtWidgets import QLineEdit
