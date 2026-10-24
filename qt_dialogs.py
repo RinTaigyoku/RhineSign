@@ -1,6 +1,6 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QDialog,QVBoxLayout,QHBoxLayout,QLabel,QLineEdit,QTableWidget,QTableWidgetItem,QAbstractItemView
-from qt_helpers import Button,Entry,messagebox
+from qt_helpers import Button,Entry,messagebox,add_visibility_toggle
 from i18n import tr as t
 import re
 
@@ -18,7 +18,7 @@ class AuthDialogs:
     def code_dialog(self,data):
         d,box=self.new_dialog(t('Apple 双重认证'),lambda:self.answer({'value':'q'}))
         label=QLabel(t('请输入手机收到的六位验证码。\n验证码仅提交给 Apple，不保存。'));label.setWordWrap(True);box.addWidget(label)
-        entry=Entry();entry.setEchoMode(QLineEdit.Password);entry.setMaxLength(6);entry.setPlaceholderText('000000');box.addWidget(entry)
+        entry=Entry();add_visibility_toggle(entry,code=True);entry.setMaxLength(6);entry.setPlaceholderText('000000');box.addWidget(entry);d.finished.connect(entry.clear)
         def submit():
             value=entry.text().strip()
             if not re.fullmatch('[0-9]{6}',value):messagebox.showerror('RhineSign',t('请输入六位数字。'),parent=d);return

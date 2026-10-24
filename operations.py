@@ -159,8 +159,7 @@ class Operations:
                 return
             self.auto_request = d['udid']
         config = {'email': self.email.get().strip(), 'password': self.password.get(), 'udid': self.udid.get().strip(), 'ipa': self.ipa.get(), 'work_dir': str(BASE), 'consent': True}
-        if self.launch('--gui', config):
-            self.password.set('')
+        self.launch('--gui', config)
         config['password'] = ''
 
     def confirm_install(self, name, udid):
@@ -217,6 +216,7 @@ class Operations:
             self.events.put({'type': 'exit', 'data': process.wait(), 'channel': channel})
 
     def set_busy(self, busy):
+        self.password_reveal.setEnabled(not busy)
         for widget in self.entries + [self.remember_check,self.browse, self.paste, self.check, self.auto, self.start_button, self.install_button, self.install_pick, self.install_entry, self.refresh, self.connect_button, self.langbutton]:
             widget.configure(state='disabled' if busy else 'normal')
         self.selector.configure(state='disabled' if busy else 'readonly')

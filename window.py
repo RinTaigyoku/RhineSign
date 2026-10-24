@@ -5,7 +5,7 @@ from PySide6.QtCore import Qt,QTimer
 from PySide6.QtGui import QIcon,QPixmap,QColor,QPalette,QFont,QFontDatabase
 from PySide6.QtSvg import QSvgRenderer
 from PySide6.QtWidgets import QApplication,QMainWindow,QWidget,QFrame,QVBoxLayout,QHBoxLayout,QGridLayout,QLabel,QStackedWidget,QScrollArea,QPlainTextEdit,QSizeGrip,QLineEdit
-from qt_helpers import Var,Button,Entry,Check,Progress,Combo,messagebox
+from qt_helpers import Var,Button,Entry,Check,Progress,Combo,messagebox,add_visibility_toggle
 from qt_dialogs import AuthDialogs
 from operations import Operations,read_settings,PROJECT
 from security import BUNDLE,VERSION,remembered_account
@@ -81,7 +81,7 @@ class RhineWindow(QMainWindow,Operations,AuthDialogs):
         body.addWidget(content,1);self.setCentralWidget(central);self.show(self.page)
     def field(self,grid,r,c,text,var,password=False):
         group=QVBoxLayout();group.setSpacing(7);group.addWidget(label(t(text),'muted'));entry=Entry();var.bind(entry)
-        if password:entry.setEchoMode(QLineEdit.Password)
+        if password:self.password_reveal=add_visibility_toggle(entry)
         group.addWidget(entry);grid.addLayout(group,r,c);self.entries.append(entry);return entry
     def build_sign(self):
         layout=self.page_layouts['sign'];account,box=card('账号','01 / APPLE ID');grid=QGridLayout();grid.setHorizontalSpacing(17);grid.setColumnStretch(0,1);grid.setColumnStretch(1,1)

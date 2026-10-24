@@ -7,6 +7,36 @@ ROOT=Path(__file__).resolve().parents[1]
 class DesktopTests(unittest.TestCase):
     def tearDown(self):i18n.set_language('zh')
 
+    def test_password_and_verification_code_visibility(self):
+        from qt_helpers import Entry,add_visibility_toggle
+        from PySide6.QtWidgets import QLineEdit
+        import window
+        app=window.create_application()
+        for code in (False,True):
+            entry=Entry();entry.setText('123456'if code else'synthetic-password')
+            action=add_visibility_toggle(entry,code)
+            self.assertEqual(entry.echoMode(),QLineEdit.Password)
+            before=entry.text();action.setChecked(True)
+            self.assertEqual(entry.echoMode(),QLineEdit.Normal);self.assertEqual(entry.text(),before)
+            action.setChecked(False);self.assertEqual(entry.echoMode(),QLineEdit.Password)
+            self.assertEqual(entry.text(),before);self.assertFalse(action.icon().isNull())
+            entry.clear();entry.deleteLater()
+
+    def test_signing_keeps_password_mask(self):
+        import window
+        from PySide6.QtWidgets import QLineEdit
+        app=window.create_application();root=window.RhineWindow(preview=True)
+        try:
+            with tempfile.TemporaryDirectory()as folder:
+                path=Path(folder)/'synthetic.ipa';path.write_bytes(b'synthetic')
+                root.email.set('test@example.invalid');root.password.set('synthetic-password')
+                root.udid.set('00008150-0000000000000000');root.ipa.set(str(path));root.consent.set(True)
+                calls=[];root.launch=lambda command,config:calls.append(command)or True
+                root.start();self.assertEqual(calls,['--gui'])
+                self.assertEqual(root.password.get(),'synthetic-password')
+                self.assertEqual(root.entries[1].echoMode(),QLineEdit.Password)
+        finally:root.close();app.processEvents()
+
     @unittest.skipUnless(os.name=='nt','Windows DPAPI')
     def test_remember_account_is_encrypted_and_removable(self):
         with tempfile.TemporaryDirectory()as folder:

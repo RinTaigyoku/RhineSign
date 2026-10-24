@@ -1,6 +1,19 @@
 from PySide6.QtCore import QObject, Signal, Slot
+from PySide6.QtGui import QAction,QIcon
 from PySide6.QtWidgets import QPushButton,QLineEdit,QCheckBox,QComboBox,QProgressBar,QMessageBox,QFileDialog
 from i18n import tr as t
+
+def add_visibility_toggle(entry,code=False):
+    from security import BUNDLE
+    entry.setEchoMode(QLineEdit.Password)
+    action=QAction(entry);action.setCheckable(True)
+    def update(shown):
+        entry.setEchoMode(QLineEdit.Normal if shown else QLineEdit.Password)
+        text=(t('隐藏验证码')if shown else t('显示验证码'))if code else(t('隐藏密码')if shown else t('显示密码'))
+        action.setText(text);action.setToolTip(text)
+        action.setIcon(QIcon(str(BUNDLE/'assets'/('eye-off.svg'if shown else'eye.svg'))))
+    action.toggled.connect(update);update(False);entry.addAction(action,QLineEdit.TrailingPosition)
+    return action
 
 class Var(QObject):
     changed=Signal(object)

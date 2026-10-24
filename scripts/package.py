@@ -5,12 +5,13 @@ r=Path(__file__).resolve().parents[1]
 subprocess.run([sys.executable,'-m','PyInstaller','--clean','--noconfirm','--onedir','--noconsole','--name','RhineSign','--icon','assets/icon.ico','--add-data','assets;assets','--add-binary','engine/target/release/rhinesign-engine.exe;engine','app.py'],cwd=r,check=True)
 out=r/'dist/RhineSign'
 for name in ('README.md','LICENSE','THIRD_PARTY_NOTICES.txt'):shutil.copyfile(r/name,out/name)
+shutil.copytree(r/'docs/screenshots',out/'docs/screenshots',dirs_exist_ok=True)
 for f in(r/'engine/target/license-report').glob('*'):shutil.copyfile(f,out/f.name)
 dep=r/'engine/generated-deps/apple-codesign-quick'
 assert(dep/'RHINESIGN_PATCH.json').is_file()
 for name in('COPYING','COPYING.LESSER'):shutil.copyfile(r/'licenses'/name,out/name)
 files=list(r.glob('*.py'))+list(r.glob('*.md'))+[r/'LICENSE',r/'THIRD_PARTY_NOTICES.txt',r/'QT-SOURCE.txt',r/'engine/Cargo.toml',r/'engine/Cargo.lock']
-for folder in ('engine/src','scripts','tests','assets','licenses','.github/workflows'):files+=list((r/folder).rglob('*'))
+for folder in ('engine/src','scripts','tests','assets','licenses','.github/workflows','docs/screenshots'):files+=list((r/folder).rglob('*'))
 files+=list(dep.rglob('*'))
 with zipfile.ZipFile(out/'CorrespondingSource.zip','w',zipfile.ZIP_DEFLATED)as z:
     for f in sorted(set(files)):

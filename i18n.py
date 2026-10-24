@@ -8,6 +8,8 @@ def set_language(value):
     _language=value
 
 EN={
+'显示密码':'Show password','隐藏密码':'Hide password',
+'显示验证码':'Show verification code','隐藏验证码':'Hide verification code',
 '离线测试签名后重打包：仅处理副本，不登录 Apple':'Offline signature/repack test: copies only, no Apple login',
 '认证请求发送给 Apple，认证辅助数据来自 ani.iloader.app。记住账号默认关闭；开启后账号密码由 Windows 当前用户加密保存，取消勾选会删除。验证码与登录会话不保存。签名密钥同样在本机加密保存。':'Authentication goes to Apple; helper data comes from ani.iloader.app. Remembering the account is off by default. If enabled, Windows encrypts the account and password for the current user; unchecking deletes them. Codes and sessions are not saved. Signing keys are also encrypted locally.',
 '记住 Apple ID 和密码（仅当前 Windows 用户）':'Remember Apple ID and password (this Windows user only)',

@@ -4,9 +4,51 @@
 
 <p align="center">Apple ID 个人签名与 iPhone USB 安装。Windows 桌面工具。</p>
 
+<p align="center">
+  <a href="https://github.com/RinTaigyoku/RhineSign/releases"><img alt="Download" src="https://img.shields.io/github/v/release/RinTaigyoku/RhineSign?include_prereleases&label=Download&color=c7dc8d&labelColor=18221c"></a>
+  <a href="https://github.com/RinTaigyoku/RhineSign/actions/workflows/build.yml"><img alt="Windows build" src="https://github.com/RinTaigyoku/RhineSign/actions/workflows/build.yml/badge.svg"></a>
+  <a href="LICENSE"><img alt="MIT" src="https://img.shields.io/badge/License-MIT-c7dc8d?labelColor=18221c"></a>
+</p>
+
+<p align="center"><a href="#下载">下载</a> · <a href="#界面">界面</a> · <a href="#怎么用">使用方法</a> · <a href="#几个常见问题">常见问题</a> · <a href="#english">English</a></p>
+
 我做这个工具，是想把选择 IPA、个人签名和安装放到一个窗口里。账号认证失败时，至少能看清失败在哪一步，而不是只得到一句“账号或密码错误”。
 
 支持中文和英文。由 **RinTaigyoku** 维护；这是社区工具，与 Apple 没有官方合作关系。
+
+## 能做什么
+
+| 功能 | 说明 |
+| --- | --- |
+| Apple ID 个人签名 | 自由选择 IPA，支持双重认证和开发者团队选择，结果单独输出 |
+| USB 连接与安装 | 读取 iPhone、带入 UDID、安装已签名 IPA，也可签名后接着安装 |
+| 可选记住账号 | 默认关闭；开启后用 Windows 当前用户加密，取消勾选即删除 |
+| 证书额度处理 | 遇到 7460 时列出证书，由你选择并再次确认，不会自动撤销 |
+| 看得见的执行过程 | 默认展开运行详情，显示认证、签名、打包、校验和安装阶段 |
+| 中英切换 | 界面、提示和常见错误说明支持中文与英文 |
+
+## 界面
+
+### 个人签名
+
+账号、目标设备和 IPA 放在同一页。“记住账号”位于密码栏下方靠右，签名期间密码继续显示掩码。密码和双重验证码输入框右侧的眼睛按钮可切换显示／隐藏。
+
+![个人签名界面](docs/screenshots/sign-zh.png)
+
+### 设备安装
+
+已有签名的 IPA 可以直接安装，不必重新登录 Apple ID。安装前会再次确认目标设备和文件。
+
+![设备安装界面](docs/screenshots/install-zh.png)
+
+<details>
+<summary>设置与关于 / English interface</summary>
+
+![设置与关于](docs/screenshots/settings-zh.png)
+
+![English interface](docs/screenshots/sign-en.png)
+
+</details>
 
 ## 下载
 
@@ -20,6 +62,8 @@
 2. 数据线连接 iPhone，解锁，在手机上信任电脑。打开“设备安装”，刷新并连接设备，UDID 会带到签名页。
 3. 在“个人签名”填写 Apple ID、登录密码，选择任意 IPA。阅读设置里的服务说明，勾选同意后开始。需要双重认证时，在弹窗输入验证码。
 4. 签名完成后，到程序旁的 `签名输出` 找到新 IPA。原文件不会覆盖。可以勾选签名完成后安装，也可以在“设备安装”单独选择已有签名的 IPA。
+
+需要记住账号时，填好密码后勾选密码栏下方的选项即可。保持不勾选时，下次启动仍需手动输入。保存的是本机加密副本，不是把密码写进配置文件。
 
 安装会再次显示文件和目标设备。同包名应用可能覆盖更新，程序不会为了安装而自动卸载旧 App。重要数据请自己备份。首次运行个人签名应用时，还可能需要在手机设置中信任开发者、启用开发者模式。
 
@@ -38,6 +82,15 @@
 **大 IPA 会不会很占内存？** USB 传输使用固定 1 MiB 缓冲，不整包读入内存。签名需要解包和重新压缩，磁盘建议预留原 IPA 大小三倍的空间。取消可能留下临时构建目录，确认没有任务运行后可以删除 `临时构建`；不要删除密钥目录。
 
 ## 源码与构建
+
+| 位置 | 内容 |
+| --- | --- |
+| `window.py`、`qt_dialogs.py` | 桌面界面、验证弹窗与证书选择 |
+| `operations.py`、`security.py` | 任务调度、本机加密存储与输入检查 |
+| `engine/src/` | Apple ID 认证、签名校验和 USB 设备安装 |
+| `tests/`、`.github/workflows/build.yml` | 检查与 Windows 发布包构建 |
+
+反馈问题可以到 [Issues](https://github.com/RinTaigyoku/RhineSign/issues)，附上软件版本、操作步骤和失败阶段。请遮挡账号、设备标识，不要上传密码、验证码、签名密钥或完整描述文件。
 
 窗口使用 Python/Qt，认证与签名、USB 连接和安装使用 Rust。签名依赖固定版本，并包含嵌套动态库权限格式修正；签名后会检查代码结构，再重新打包并核验资源。
 
