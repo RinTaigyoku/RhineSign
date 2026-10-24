@@ -1,5 +1,7 @@
-from PySide6.QtCore import QObject, Signal, Slot
-from PySide6.QtGui import QAction,QIcon
+from PySide6.QtCore import QObject, Signal, Slot,Qt,QSize,QRectF
+from PySide6.QtGui import QAction,QIcon,QPixmap,QPainter,QColor
+from PySide6.QtSvg import QSvgRenderer
+from functools import lru_cache
 from PySide6.QtWidgets import QPushButton,QLineEdit,QCheckBox,QComboBox,QProgressBar,QMessageBox,QFileDialog
 from i18n import tr as t
 
@@ -36,10 +38,26 @@ class Configurable:
         if 'values'in values:self.clear();self.addItems(values['values'])
 
 class Button(QPushButton,Configurable):
-    def __init__(self,text,action=None,primary=False):
+    def __init__(self,text,action=None,primary=False,icon=None):
         super().__init__(text);self.setCursor(__import__('PySide6.QtCore',fromlist=['Qt']).Qt.PointingHandCursor)
         if action:self.clicked.connect(action)
         if primary:self.setObjectName('primary')
+        if icon:self.setIcon(button_icon(icon,primary));self.setIconSize(QSize(18,18))
+
+@lru_cache(maxsize=40)
+def button_icon(name,primary=False):
+    from security import BUNDLE
+    renderer=QSvgRenderer(str(BUNDLE/'assets/fontawesome'/(name+'.svg')))
+    if not renderer.isValid():raise ValueError('Missing interface icon')
+    icon=QIcon();source=renderer.defaultSize()
+    for size in (18,24,36,48,64):
+        for mode,color in ((QIcon.Normal,'#152019'if primary else'#d3dfc8'),(QIcon.Disabled,'#788570')):
+            pixmap=QPixmap(size,size);pixmap.fill(Qt.transparent);painter=QPainter(pixmap)
+            scale=(size-2)/max(source.width(),source.height());w=source.width()*scale;h=source.height()*scale
+            renderer.render(painter,QRectF((size-w)/2,(size-h)/2,w,h))
+            painter.setCompositionMode(QPainter.CompositionMode_SourceIn);painter.fillRect(pixmap.rect(),QColor(color));painter.end()
+            icon.addPixmap(pixmap,mode)
+    return icon
 class Entry(QLineEdit,Configurable):pass
 class Check(QCheckBox,Configurable):pass
 class Progress(QProgressBar,Configurable):

@@ -40,6 +40,8 @@ def cleanup_workspace(path, pid, base=BASE):
 
 class Operations:
 
+    def open_bilibili(self):webbrowser.open('https://space.bilibili.com/630856108')
+
     def open_device_download(self):webbrowser.open(APPLE_DEVICES)
 
     def open_driver_help(self):webbrowser.open('https://support.apple.com/'+('zh-cn'if language()=='zh'else'en-us')+'/118290')

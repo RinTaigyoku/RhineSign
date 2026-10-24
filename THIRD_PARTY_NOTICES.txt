@@ -1,3 +1,10 @@
+Interface icons: Font Awesome Free 7.3.1 by Fonticons, Inc.
+https://fontawesome.com/ — https://fontawesome.com/license/free
+SVG icons are licensed under CC BY 4.0: https://creativecommons.org/licenses/by/4.0/
+Original SVGs and attribution comments are retained. Icons are tinted and scaled
+at runtime. GitHub and Bilibili marks represent links to their respective services;
+their use does not imply endorsement. Full upstream terms: licenses/FONT-AWESOME-LICENSE.txt.
+
 MIT License
 
 Copyright (c) 2025 nab138

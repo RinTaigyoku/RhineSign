@@ -1,0 +1,75 @@
+{
+  "project": "Font Awesome Free",
+  "version": "7.3.1",
+  "commit": "14c65a3747d0f3b751f15831fc719236aea8729d",
+  "license": "CC-BY-4.0 for SVG icons",
+  "source_files_unmodified": true,
+  "display_adaptation": "Tinted and scaled at runtime",
+  "files": [
+    {
+      "file": "sign.svg",
+      "source": "svgs/solid/signature.svg",
+      "sha256": "9ba2c550d56f29035fcc3850a7d6f845681d0768589ff7425dd7c462ccb93f2b"
+    },
+    {
+      "file": "device.svg",
+      "source": "svgs/solid/mobile-screen-button.svg",
+      "sha256": "206667a9434429e7172b64601a28e4123d1f3a7272bc048251ebf27b15e1d0cc"
+    },
+    {
+      "file": "settings.svg",
+      "source": "svgs/solid/gear.svg",
+      "sha256": "36f00f6b2f6aaf9956d9c79911d7e3695d978cd378692e714e9e5570f3099f63"
+    },
+    {
+      "file": "file.svg",
+      "source": "svgs/solid/file.svg",
+      "sha256": "bc3c3d22a7d287688d2ef858a2841dc05c12b81f92f1f101edccca333d2fb84b"
+    },
+    {
+      "file": "plug.svg",
+      "source": "svgs/solid/plug.svg",
+      "sha256": "ed9db76719377f3c5c34bd39f902bb994ab550aa6c870f24b2baa20d52bec27e"
+    },
+    {
+      "file": "refresh.svg",
+      "source": "svgs/solid/arrows-rotate.svg",
+      "sha256": "203d0684b68803d7e418805652fdbec0d3074181ca8092bfc92b380e2a9ba8c3"
+    },
+    {
+      "file": "download.svg",
+      "source": "svgs/solid/download.svg",
+      "sha256": "13fa3d05e2ade6fe49b3a162e3f20143ccd2714d78b0dbea5774dd7dcae17597"
+    },
+    {
+      "file": "help.svg",
+      "source": "svgs/solid/circle-question.svg",
+      "sha256": "b61f21066271997c96bd7edff402c6befb9b319cb00d4b37ba3d9850f21fbed4"
+    },
+    {
+      "file": "folder.svg",
+      "source": "svgs/solid/folder-open.svg",
+      "sha256": "aff3c50819cdb466c1025555b84a577885cd1b4de93f8d11fc055977712000db"
+    },
+    {
+      "file": "github.svg",
+      "source": "svgs/brands/github.svg",
+      "sha256": "61092c02fa2e95631eeb472b7fccd5230b0a5da3574847e22fecd974fad496d9"
+    },
+    {
+      "file": "bilibili.svg",
+      "source": "svgs/brands/bilibili.svg",
+      "sha256": "089708ff9c47fd694a366284b756c51473c67f3b223e4c0487e9d60c0cd20a4d"
+    },
+    {
+      "file": "license.svg",
+      "source": "svgs/solid/file-lines.svg",
+      "sha256": "1d60811c2a08d6e6f86184c157f5e13e92ceeb72cc30c2b9e73654fc2e42df96"
+    },
+    {
+      "file": "external.svg",
+      "source": "svgs/solid/arrow-up-right-from-square.svg",
+      "sha256": "0b5332a63c92fc1f3f1cd8ccfae90cb2e70047a76f50a79a15db6c413b77edab"
+    }
+  ]
+}

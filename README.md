@@ -14,7 +14,7 @@
 
 我做这个工具，是想把选择 IPA、个人签名和安装放到一个窗口里。账号认证失败时，至少能看清失败在哪一步，而不是只得到一句“账号或密码错误”。
 
-支持中文和英文。由 **RinTaigyoku** 维护；这是社区工具，与 Apple 没有官方合作关系。
+支持中文和英文。由 **RinTaigyoku** 维护 · [哔哩哔哩主页](https://space.bilibili.com/630856108)。这是社区工具，与 Apple 没有官方合作关系。
 
 ## 能做什么
 
@@ -109,6 +109,8 @@ python scripts/package.py
 Windows 发布流程在 `.github/workflows/build.yml`。发布附带校验和、依赖许可和对应源码，修改后可以重新编译并替换 `_internal/engine/rhinesign-engine.exe`。Python 3.12，Rust stable。
 
 自己的代码采用 MIT 许可。依赖保留各自许可，特别是修改后的 `apple-codesign-quick` 采用 LGPL-2.1-or-later，对应源码随每次发布提供。
+
+界面常用图标采用 [Font Awesome Free](https://fontawesome.com/) 7.3.1，由 Fonticons, Inc. 提供，SVG 图标遵循 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)；原始文件与署名保留，程序只在显示时调整颜色和尺寸。GitHub、哔哩哔哩品牌图标分别用于对应服务链接。完整说明见 [第三方许可](THIRD_PARTY_NOTICES.txt)。
 
 ## English
 

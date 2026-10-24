@@ -73,13 +73,13 @@ class RhineWindow(QMainWindow,Operations,AuthDialogs):
         side=QFrame();side.setObjectName('sidebar');side.setFixedWidth(210);nav=QVBoxLayout(side);nav.setContentsMargins(18,27,18,18);nav.setSpacing(7)
         badge=QLabel();badge.setPixmap(self.app_icon.pixmap(55,55));nav.addWidget(badge);nav.addSpacing(9);nav.addWidget(label('RhineSign','brand'));nav.addWidget(label('APPLICATION STUDIO','eyebrow'));nav.addSpacing(24);nav.addWidget(label('WORKSPACE / 01','eyebrow'));nav.addSpacing(5);self.nav=[]
         for key,text in [('sign','个人签名'),('install','设备安装'),('settings','设置与关于')]:
-            b=Button(t(text),lambda checked=False,k=key:self.show(k));b.setObjectName('nav');b.setCheckable(True);nav.addWidget(b);self.nav.append((key,b))
+            b=Button(t(text),lambda checked=False,k=key:self.show(k),icon={'sign':'sign','install':'device','settings':'settings'}[key]);b.setObjectName('nav');b.setCheckable(True);nav.addWidget(b);self.nav.append((key,b))
         nav.addStretch();nav.addWidget(label('RS—05   /   DESKTOP','eyebrow'));nav.addWidget(label('RinTaigyoku','muted'));body.addWidget(side)
         content=QWidget();main=QVBoxLayout(content);main.setContentsMargins(29,23,29,12);main.setSpacing(9)
         self.heading=label('','headline');self.subtitle=label('','muted');main.addWidget(self.heading);main.addWidget(self.subtitle);main.addSpacing(9);self.stack=QStackedWidget();main.addWidget(self.stack,1);self.pages={};self.page_layouts={}
         for key in ('sign','install','settings'):
             scroll=QScrollArea();scroll.setWidgetResizable(True);inner=QWidget();layout=QVBoxLayout(inner);layout.setContentsMargins(0,0,8,3);layout.setSpacing(9);scroll.setWidget(inner);self.stack.addWidget(scroll);self.pages[key]=scroll;self.page_layouts[key]=layout
-        self.build_sign();self.build_install();self.build_settings();foot=QHBoxLayout();credit=label('© 2026 RinTaigyoku  ·  v'+VERSION,'muted');credit.setWordWrap(False);foot.addWidget(credit);foot.addStretch();link=Button(t('项目主页 ↗'),lambda:webbrowser.open(PROJECT));link.setObjectName('quiet');foot.addWidget(link);foot.addWidget(QSizeGrip(self));main.addLayout(foot)
+        self.build_sign();self.build_install();self.build_settings();foot=QHBoxLayout();credit=label('© 2026 RinTaigyoku  ·  v'+VERSION,'muted');credit.setWordWrap(False);foot.addWidget(credit);foot.addStretch();link=Button(t('项目主页 ↗'),lambda:webbrowser.open(PROJECT),icon='github');link.setObjectName('quiet');foot.addWidget(link);foot.addWidget(QSizeGrip(self));main.addLayout(foot)
         body.addWidget(content,1);self.setCentralWidget(central);self.show(self.page)
     def field(self,grid,r,c,text,var,password=False):
         group=QVBoxLayout();group.setSpacing(7);group.addWidget(label(t(text),'muted'));entry=Entry();var.bind(entry)
@@ -91,10 +91,10 @@ class RhineWindow(QMainWindow,Operations,AuthDialogs):
         self.remember_check=Check(t('记住 Apple ID 和密码（仅当前 Windows 用户）'));self.remember.bind(self.remember_check);self.remember_check.toggled.connect(self.remember_changed)
         email.editingFinished.connect(self.persist_account);password.editingFinished.connect(self.persist_account)
         box.addLayout(row(None,self.remember_check));layout.addWidget(account)
-        app,box=card('应用与目标设备','02 / IPA + USB');entry=Entry();entry.setPlaceholderText(t('选择要签名的 IPA'));self.ipa.bind(entry);self.entries.append(entry);self.browse=Button(t('选择 IPA…'),self.pick_ipa);box.addLayout(row(entry,self.browse))
-        entry=Entry();entry.setPlaceholderText('iPhone UDID');self.udid.bind(entry);self.entries.append(entry);self.paste=Button(t('读取设备'),self.use_device);box.addLayout(row(entry,self.paste));box.addWidget(label(t('勾选记住后账号密码由 Windows 加密保存在本机；验证码与登录会话不保存。'),'muted'));layout.addWidget(app)
+        app,box=card('应用与目标设备','02 / IPA + USB');entry=Entry();entry.setPlaceholderText(t('选择要签名的 IPA'));self.ipa.bind(entry);self.entries.append(entry);self.browse=Button(t('选择 IPA…'),self.pick_ipa,icon='file');box.addLayout(row(entry,self.browse))
+        entry=Entry();entry.setPlaceholderText('iPhone UDID');self.udid.bind(entry);self.entries.append(entry);self.paste=Button(t('读取设备'),self.use_device,icon='plug');box.addLayout(row(entry,self.paste));box.addWidget(label(t('勾选记住后账号密码由 Windows 加密保存在本机；验证码与登录会话不保存。'),'muted'));layout.addWidget(app)
         self.check=Check(t('已阅读设置页的服务说明，同意本次个人签名'));self.consent.bind(self.check);layout.addWidget(self.check);self.auto=Check(t('签名完成后安装到已连接的目标 iPhone'));self.auto_install.bind(self.auto);layout.addWidget(self.auto)
-        self.start_button=Button(t('开始个人签名  →'),self.start,True);self.cancel_button=Button(t('取消任务'),self.cancel);self.cancel_button.setEnabled(False);output=Button(t('输出文件夹'),self.open_output);output.setObjectName('quiet');layout.addLayout(row(self.start_button,self.cancel_button,None,output))
+        self.start_button=Button(t('开始个人签名  →'),self.start,True,icon='sign');self.cancel_button=Button(t('取消任务'),self.cancel);self.cancel_button.setEnabled(False);output=Button(t('输出文件夹'),self.open_output,icon='folder');output.setObjectName('quiet');layout.addLayout(row(self.start_button,self.cancel_button,None,output))
         self.status.set(t('准备就绪'));status=label('','muted');self.status.bind(status);self.log=QPlainTextEdit();self.log.setReadOnly(True);self.log.setMaximumBlockCount(180);self.log.setFixedHeight(78)
         details=Button(t('收起详情'));details.setObjectName('quiet')
         def toggle_details():
@@ -104,19 +104,19 @@ class RhineWindow(QMainWindow,Operations,AuthDialogs):
         layout.addStretch()
     def build_install(self):
         layout=self.page_layouts['install'];device,box=card('USB 连接','01 / DEVICE');box.addWidget(label(t('用数据线连接 iPhone，解锁后信任此电脑。'),'muted'))
-        self.selector=Combo();self.selector.addItems(self.device_labels());self.device_choice.bind(self.selector);self.refresh=Button(t('刷新设备'),self.refresh_devices);box.addLayout(row(self.selector,self.refresh));self.connect_button=Button(t('连接并读取设备信息'),self.connect_device);box.addLayout(row(self.connect_button,None))
+        self.selector=Combo();self.selector.addItems(self.device_labels());self.device_choice.bind(self.selector);self.refresh=Button(t('刷新设备'),self.refresh_devices,icon='refresh');box.addLayout(row(self.selector,self.refresh));self.connect_button=Button(t('连接并读取设备信息'),self.connect_device,icon='plug');box.addLayout(row(self.connect_button,None))
         self.device_status.set(t('尚未连接设备'));status=label('','muted');self.device_status.bind(status);box.addWidget(status)
-        self.driver_download=Button(t('安装 Apple 设备软件 ↗'),self.open_device_download);self.driver_download.setObjectName('quiet');box.addLayout(row(self.driver_download,Button(t('官方安装帮助 ↗'),self.open_driver_help),None));layout.addWidget(device)
-        package,box=card('安装已签名 IPA','02 / INSTALL');box.addWidget(label(t('安装不需要重新登录 Apple ID；签名必须有效且适用于这台设备。'),'muted'));self.install_entry=Entry();self.install_ipa.bind(self.install_entry);self.install_pick=Button(t('选择 IPA…'),self.pick_install);box.addLayout(row(self.install_entry,self.install_pick))
-        self.install_button=Button(t('安装到 iPhone  →'),self.start_install,True);self.install_cancel=Button(t('取消任务'),self.cancel);self.install_cancel.setEnabled(False);box.addLayout(row(self.install_button,self.install_cancel,None));self.install_status.set(t('等待安装'));status=label('','muted');self.install_status.bind(status);box.addWidget(status);self.install_progress=Progress();box.addWidget(self.install_progress);layout.addWidget(package)
+        self.driver_download=Button(t('安装 Apple 设备软件 ↗'),self.open_device_download,icon='download');self.driver_download.setObjectName('quiet');box.addLayout(row(self.driver_download,Button(t('官方安装帮助 ↗'),self.open_driver_help,icon='help'),None));layout.addWidget(device)
+        package,box=card('安装已签名 IPA','02 / INSTALL');box.addWidget(label(t('安装不需要重新登录 Apple ID；签名必须有效且适用于这台设备。'),'muted'));self.install_entry=Entry();self.install_ipa.bind(self.install_entry);self.install_pick=Button(t('选择 IPA…'),self.pick_install,icon='file');box.addLayout(row(self.install_entry,self.install_pick))
+        self.install_button=Button(t('安装到 iPhone  →'),self.start_install,True,icon='device');self.install_cancel=Button(t('取消任务'),self.cancel);self.install_cancel.setEnabled(False);box.addLayout(row(self.install_button,self.install_cancel,None));self.install_status.set(t('等待安装'));status=label('','muted');self.install_status.bind(status);box.addWidget(status);self.install_progress=Progress();box.addWidget(self.install_progress);layout.addWidget(package)
         self.install_log=QPlainTextEdit();self.install_log.setReadOnly(True);self.install_log.setMaximumBlockCount(180);self.install_log.setFixedHeight(78);layout.addWidget(self.install_log)
         for text in self.logs[-180:]:self.install_log.appendPlainText(text)
         layout.addWidget(label(t('安装失败时保留当前 App，不自动卸载。需要 Apple 的 USB 驱动和设备服务。'),'muted'));layout.addStretch()
     def build_settings(self):
-        layout=self.page_layouts['settings'];about,box=card('署名','RHINESIGN / '+VERSION);box.addWidget(label('RinTaigyoku','brand'));box.addLayout(row(Button(t('GitHub 项目 ↗'),lambda:webbrowser.open(PROJECT)),Button(t('下载与更新 ↗'),lambda:webbrowser.open(PROJECT+'/releases')),Button(t('许可证'),self.open_license),None));layout.addWidget(about)
+        layout=self.page_layouts['settings'];about,box=card('署名','RHINESIGN / '+VERSION);box.addWidget(label('RinTaigyoku','brand'));box.addLayout(row(Button(t('GitHub 项目 ↗'),lambda:webbrowser.open(PROJECT),icon='github'),Button(t('哔哩哔哩主页 ↗'),self.open_bilibili,icon='bilibili'),Button(t('下载与更新 ↗'),lambda:webbrowser.open(PROJECT+'/releases'),icon='download'),Button(t('许可证'),self.open_license,icon='license'),None));layout.addWidget(about)
         for title,code,text in [('服务说明','AUTH / PRIVACY','认证请求发送给 Apple，认证辅助数据来自 ani.iloader.app。记住账号默认关闭；开启后账号密码由 Windows 当前用户加密保存，取消勾选会删除。验证码与登录会话不保存。签名密钥同样在本机加密保存。'),('使用限制','ACCOUNT / DEVICE','个人账户的有效期、设备与 App 数量由 Apple 限制。签名暂不支持带 App Extension 的 IPA；设备安装不提供绕过签名或开发者模式的功能。')]:
             frame,box=card(title,code);box.addWidget(label(t(text),'muted'));layout.addWidget(frame)
-        help_card,box=card('连接帮助','HELP / USB');box.addWidget(label(t('首次连接：安装 Apple 设备软件，解锁 iPhone 并信任电脑，再回到设备安装页刷新。'),'muted'));box.addLayout(row(Button(t('安装 Apple 设备软件 ↗'),self.open_device_download),Button(t('官方安装帮助 ↗'),self.open_driver_help),None));layout.addWidget(help_card)
+        help_card,box=card('连接帮助','HELP / USB');box.addWidget(label(t('首次连接：安装 Apple 设备软件，解锁 iPhone 并信任电脑，再回到设备安装页刷新。'),'muted'));box.addLayout(row(Button(t('安装 Apple 设备软件 ↗'),self.open_device_download,icon='download'),Button(t('官方安装帮助 ↗'),self.open_driver_help,icon='help'),None));layout.addWidget(help_card)
         layout.addStretch()
     def show(self,page=None):
         if page is None:return super().show()

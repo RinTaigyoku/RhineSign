@@ -30,3 +30,4 @@ for distribution in ('PySide6-Essentials','shiboken6'):
                 target=out/'Qt-Licenses'/distribution/str(item).replace('..','_')
                 target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(source,target)
 shutil.copyfile(r/'QT-SOURCE.txt',out/'QT-SOURCE.txt')
+shutil.copytree(r/'licenses',out/'licenses',dirs_exist_ok=True)
