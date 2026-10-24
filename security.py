@@ -10,7 +10,7 @@ import sys
 import threading
 import ctypes
 from i18n import tr as _t
-VERSION = '0.5.1'
+VERSION = '1.0.0'
 BASE = Path(sys.executable).resolve().parent if getattr(sys, 'frozen', False) else Path(__file__).resolve().parent
 BUNDLE = Path(getattr(sys, '_MEIPASS', BASE))
 

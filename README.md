@@ -54,7 +54,7 @@
 
 从 [Releases](https://github.com/RinTaigyoku/RhineSign/releases) 下载 Windows x64 压缩包，完整解压后打开 `RhineSign.exe`。不要单独移动 EXE，旁边的 `_internal` 也要保留。
 
-目前是 **0.5.1 Beta**。个人签名沿用已实际使用过的认证流程；USB 安装的设备兼容性还需要更多实测。构建和离线检查通过，不代表所有 iOS 版本都能安装成功。
+目前是 **1.0 正式版**。基于用户实测反馈“本次功能全部正常并且可以用”的版本定版，保留已通过使用验证的功能。其他设备和系统组合仍可能存在差异；遇到问题欢迎反馈。
 
 ## 怎么用
 
@@ -120,7 +120,7 @@ Download the Windows x64 archive from [Releases](https://github.com/RinTaigyoku/
 
 The Devices and Settings pages link to [Apple's official setup instructions](https://support.apple.com/en-us/118290) and the Apple Devices listing in Microsoft Store. Use the eye buttons to show or hide a password or verification code. The title bar's minimize button keeps the operation running in the Windows taskbar.
 
-This is a **beta**. USB installation is new and has not been verified across devices. Apple account limits, expiry, signature verification and Developer Mode still apply. Signing IPAs containing App Extensions is not supported yet.
+**Version 1.0 is the first stable release**, promoted from the build whose functionality was confirmed working in user testing. This does not establish compatibility with every device or OS combination. Apple account limits, expiry, signature verification and Developer Mode still apply. Signing IPAs containing App Extensions is not supported yet.
 
 Remembering the Apple ID and password is off by default. If enabled, Windows encrypts them for the current user in `.rhinesign-account.dpapi`; unchecking removes them. Verification codes and login sessions are never saved. Authentication goes to Apple; helper data comes from `ani.iloader.app`. Private signing keys are also encrypted for the current Windows user. Do not share account caches, the private-key folder or pairing records. No telemetry or automatic certificate revocation.
 
