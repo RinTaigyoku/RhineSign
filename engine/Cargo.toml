@@ -1,0 +1,28 @@
+[package]
+name = "rhinesign-engine"
+version = "0.5.0"
+edition = "2024"
+license = "MIT"
+
+[dependencies]
+isideload = { git = "https://github.com/nab138/isideload", rev = "065e852b2092f1386c88195ea3a6506f6b917742", default-features = false, features = ["install", "tokio-mt"] }
+idevice = { version = "=0.1.68", default-features = false, features = ["ring", "usbmuxd", "pair", "afc", "installation_proxy"] }
+apple-codesign-quick = "0.1.0"
+tokio = { version = "1.49", features = ["rt-multi-thread", "macros", "time"] }
+rootcause = "0.12"
+rpassword = "7.4"
+zeroize = "1.8"
+rustls = { version = "0.23", default-features = false, features = ["ring"] }
+plist = "1.8"
+x509-cert = "0.2.5"
+zip = { version = "8.3", default-features = false, features = ["deflate"] }
+walkdir = "2.5"
+
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+[profile.release]
+strip = true
+
+[patch.crates-io]
+apple-codesign-quick = { path = "generated-deps/apple-codesign-quick" }
