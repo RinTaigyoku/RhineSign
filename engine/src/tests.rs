@@ -1,6 +1,22 @@
 mod tests {
     use super::*;
     use isideload::SideloadError;
+    #[test] fn removed_store_signature_is_allowed_but_normal_resources_are_protected(){
+        let root=std::env::temp_dir().join(format!("rs-store-metadata-{}",std::process::id()));
+        let app=root.join("tree/Payload/test.app");fs::create_dir_all(app.join("SC_Info")).unwrap();
+        fs::create_dir_all(app.join("assets/SC_Info")).unwrap();
+        fs::write(app.join("SC_Info/test.sinf"),b"obsolete store signature").unwrap();
+        fs::write(app.join("assets/SC_Info/keep.bin"),b"protected application resource").unwrap();
+        pack_signed(&root.join("tree"),&root.join("original.ipa")).unwrap();
+        fs::remove_dir_all(app.join("SC_Info")).unwrap();
+        pack_signed(&root.join("tree"),&root.join("signed.ipa")).unwrap();
+        // Reproduces beta 0.5.0's ZipError::FileNotFound before the fix.
+        verify_resources(&root.join("original.ipa"),&root.join("signed.ipa")).unwrap();
+        fs::remove_file(app.join("assets/SC_Info/keep.bin")).unwrap();
+        pack_signed(&root.join("tree"),&root.join("missing.ipa")).unwrap();
+        assert!(verify_resources(&root.join("original.ipa"),&root.join("missing.ipa")).is_err());
+        fs::remove_dir_all(root).unwrap();
+    }
     #[test] fn local_archive_error_is_not_an_authentication_error(){
         let e:Report=report!(io::Error::from_raw_os_error(5)).context("archive_pack_failed").into();
         let message=safe_error(&e);

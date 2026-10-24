@@ -58,6 +58,13 @@ pub(crate) fn pack_signed(root: &Path, output: &Path) -> Result<(),Report> {
     writer.finish()?.sync_all()?;Ok(())
 }
 
+fn obsolete_store_signature(name:&str)->bool {
+    // The pinned signer removes SC_Info from executable bundles. It is obsolete
+    // App Store signature metadata, not an application resource. Do not exempt
+    // arbitrary resource directories that happen to be called SC_Info.
+    name.split_once("/SC_Info/").is_some_and(|(bundle,_)|bundle.ends_with(".app")||bundle.ends_with(".framework")||bundle.ends_with(".appex"))
+}
+
 pub(crate) fn verify_resources(input: &Path, output: &Path) -> Result<(),Report> {
     let mut original=zip::ZipArchive::new(fs::File::open(input)?)?;
     let mut signed=zip::ZipArchive::new(fs::File::open(output)?)?;
@@ -67,7 +74,7 @@ pub(crate) fn verify_resources(input: &Path, output: &Path) -> Result<(),Report>
     for i in 0..signed.len(){let mut f=signed.by_index(i)?;if !names.insert(f.name().to_owned()){bail!("duplicate_signed_entry");}io::copy(&mut f,&mut io::sink())?;}
     for i in 0..original.len(){
         let mut f=original.by_index(i)?;
-        if !f.is_dir()&&!f.name().ends_with("Info.plist")&&!f.name().ends_with("embedded.mobileprovision")&&!f.name().contains("/_CodeSignature/")&&!f.name().ends_with(".dylib") {
+        if !f.is_dir()&&!obsolete_store_signature(f.name())&&!f.name().ends_with("Info.plist")&&!f.name().ends_with("embedded.mobileprovision")&&!f.name().contains("/_CodeSignature/")&&!f.name().ends_with(".dylib") {
             let mut magic=[0u8;4];let n=f.read(&mut magic)?;
             let macho=n==4&&[[0xcf,0xfa,0xed,0xfe],[0xce,0xfa,0xed,0xfe],[0xca,0xfe,0xba,0xbe],[0xca,0xfe,0xba,0xbf],[0xfe,0xed,0xfa,0xcf],[0xfe,0xed,0xfa,0xce]].contains(&magic);
             if !macho {let out=signed.by_name(f.name())?;if out.size()!=f.size()||out.crc32()!=f.crc32(){bail!("protected_resource_changed");}}

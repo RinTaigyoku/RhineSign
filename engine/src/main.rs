@@ -131,7 +131,7 @@ fn main(){
     std::panic::set_hook(Box::new(|_|event("error",json!({"message":"签名引擎异常退出；未打印内部认证响应。"}))));
     if std::env::args().nth(1).as_deref()==Some("--self-test"){if self_test().is_err(){std::process::exit(1);}return;}
     // Credential-free reproduction of the same extraction/packing/verification path.
-    if std::env::args().nth(1).as_deref()==Some("--check-repack"){
+    if matches!(std::env::args().nth(1).as_deref(),Some("--check-repack"|"--check-signing-repack")){
         let result=(||->Result<(),Report>{
             let input=PathBuf::from(std::env::args_os().nth(2).ok_or_else(||report!("ipa_required"))?).canonicalize()?;
             let workspace=PathBuf::from(std::env::args_os().nth(3).ok_or_else(||report!("invalid_work_dir"))?);
@@ -141,6 +141,11 @@ fn main(){
             isideload::init()?;
             stage("离线解包检查：不登录 Apple，不修改签名");
             let app=Application::new(input.clone())?;
+            if std::env::args().nth(1).as_deref()==Some("--check-signing-repack"){
+                stage("离线测试签名后重打包：仅处理副本，不登录 Apple");
+                let settings=apple_codesign_quick::BundleSigningSettings::new("OFFLINETEST",plist::Dictionary::new(),None);
+                apple_codesign_quick::sign_bundle(&app.bundle.bundle_dir,&settings)?;
+            }
             let root=app.bundle.bundle_dir.parent().and_then(|p|p.parent()).ok_or_else(||report!("archive_root_missing"))?;
             let packed=workspace.join("repacked.ipa");
             stage("离线重新打包检查");pack_signed(root,&packed).context("archive_pack_failed")?;
