@@ -116,6 +116,8 @@ RhineSign is a Windows desktop app for Apple ID personal signing and USB install
 
 Download the Windows x64 archive from [Releases](https://github.com/RinTaigyoku/RhineSign/releases), extract the entire folder and run `RhineSign.exe`. Install Apple's device drivers/services, connect and trust your iPhone, then choose a device. Sign an arbitrary IPA with your Apple ID, or install an already signed IPA without signing in again. Existing apps are never automatically uninstalled.
 
+The Devices and Settings pages link to [Apple's official setup instructions](https://support.apple.com/en-us/118290) and the Apple Devices listing in Microsoft Store. Use the eye buttons to show or hide a password or verification code. The title bar's minimize button keeps the operation running in the Windows taskbar.
+
 This is a **beta**. USB installation is new and has not been verified across devices. Apple account limits, expiry, signature verification and Developer Mode still apply. Signing IPAs containing App Extensions is not supported yet.
 
 Remembering the Apple ID and password is off by default. If enabled, Windows encrypts them for the current user in `.rhinesign-account.dpapi`; unchecking removes them. Verification codes and login sessions are never saved. Authentication goes to Apple; helper data comes from `ani.iloader.app`. Private signing keys are also encrypted for the current Windows user. Do not share account caches, the private-key folder or pairing records. No telemetry or automatic certificate revocation.
