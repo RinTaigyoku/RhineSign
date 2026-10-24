@@ -88,7 +88,7 @@ class RhineWindow(QMainWindow,Operations,AuthDialogs):
         email=self.field(grid,0,0,'Apple ID',self.email);password=self.field(grid,0,1,'登录密码',self.password,True);box.addLayout(grid)
         self.remember_check=Check(t('记住 Apple ID 和密码（仅当前 Windows 用户）'));self.remember.bind(self.remember_check);self.remember_check.toggled.connect(self.remember_changed)
         email.editingFinished.connect(self.persist_account);password.editingFinished.connect(self.persist_account)
-        box.addWidget(self.remember_check);layout.addWidget(account)
+        box.addLayout(row(None,self.remember_check));layout.addWidget(account)
         app,box=card('应用与目标设备','02 / IPA + USB');entry=Entry();entry.setPlaceholderText(t('选择要签名的 IPA'));self.ipa.bind(entry);self.entries.append(entry);self.browse=Button(t('选择 IPA…'),self.pick_ipa);box.addLayout(row(entry,self.browse))
         entry=Entry();entry.setPlaceholderText('iPhone UDID');self.udid.bind(entry);self.entries.append(entry);self.paste=Button(t('读取设备'),self.use_device);box.addLayout(row(entry,self.paste));box.addWidget(label(t('勾选记住后账号密码由 Windows 加密保存在本机；验证码与登录会话不保存。'),'muted'));layout.addWidget(app)
         self.check=Check(t('已阅读设置页的服务说明，同意本次个人签名'));self.consent.bind(self.check);layout.addWidget(self.check);self.auto=Check(t('签名完成后安装到已连接的目标 iPhone'));self.auto_install.bind(self.auto);layout.addWidget(self.auto)
